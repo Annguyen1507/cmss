@@ -1,8 +1,8 @@
 import AuthLayout from '../layouts/AuthLayout';
-import LoginForm from '../features/LoginForm';
+import LoginForm from '../features/auth/LoginForm';
 import logo from '../assets/logo.svg'
 
-export default function () {
+export default function Login() {
   return (
     <AuthLayout>
       <div
@@ -11,7 +11,7 @@ export default function () {
         <img
           src={logo}
           alt="NurtureWave Logo"
-          className="mx-auto w-[70px]"
+          className="mx-auto w-[190px] h-[72px]"
         />
 
         <h1 className="mt-8 text-center text-[16px] font-bold">

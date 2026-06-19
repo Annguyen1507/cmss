@@ -7,7 +7,7 @@ export default function AuthLayout({
 }) {
   return (
     <div
-      className="h-screen bg-cover bg-no-repeat"
+      className="h-screen bg-cover bg-no-repeat bg-center"
       style={{
         backgroundImage: `url(${bgAuth})`,
       }}
