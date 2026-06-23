@@ -7,7 +7,7 @@ import RouteProgress from './components/RouteProgress';
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Voucher = lazy(() => import('./pages/Voucher'));
-const DashboardLayout = lazy(() => import('./layouts/Dashboardlayout'))
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
 const Article = lazy(() => import('./pages/Article'));
 
 export default function App() {

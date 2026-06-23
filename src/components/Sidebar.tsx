@@ -1,9 +1,4 @@
-  import {
-    Menu,
-    ChevronDown,
-    Ellipsis,
-    LogOut,
-  } from 'lucide-react';
+  import { Menu, ChevronDown, Ellipsis, LogOut } from 'lucide-react';
   import { useState } from 'react';
   import { useNavigate, useLocation } from 'react-router-dom';
   import { sidebarItems } from '../constants/sidebar';
@@ -28,7 +23,7 @@
 
     return (
       <aside
-        className="flex h-screen w-[280px] flex-col border-r border-gray-200 bg-white"
+        className="flex h-full w-[280px] flex-col border-r border-gray-200 bg-white"
       >
         <div
           className="flex h-[68px] items-center justify-between bg-[#4B00A7] px-6 text-white"

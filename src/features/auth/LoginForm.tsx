@@ -1,6 +1,5 @@
 import { useForm, } from 'react-hook-form';
 import InputField from '../../components/InputField';
-import PasswordField from '../../components/PasswordField';
 import { login } from '../../api/auth.service';
 import { useNavigate } from 'react-router-dom';
 import PasswordRequirement from '../../components/PasswordRequirement';
@@ -91,19 +90,29 @@ export default function LoginForm() {
       <InputField
         label="Username or email"
         placeholder="Username or email"
-        error={
-          errors.username?.message
-        }
+        error={errors.username?.message}
         {...register('username', {
           required:
             'This field is required',
         })}
       />
-      <PasswordField
+      <InputField
+        label="Pasword"
+        type="password"
         placeholder="Password"
         error={errors.password?.message}
         {...register('password', {
           required: 'This field is required',
+          validate: (value) => {
+            const valid =
+              value.length >= 8 &&
+              value.length <= 32 &&
+              /[A-Z]/.test(value) &&
+              /\d/.test(value) &&
+              /[^A-Za-z0-9]/.test(value);
+
+            return valid || 'Invalid password format';
+          },
         })}
       />
 
