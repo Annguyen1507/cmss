@@ -4,9 +4,11 @@ import DataTable from '../components/DataTable';
 import { getArticles } from '../api/article.service';
 import { articleColumns } from '../features/article/articleColumns';
 import type { Article } from '../features/article/type';
+import usePageParam from '../hooks/usePageParam';
 
 export default function Article() {
     const [articles, setArticles] = useState<Article[]>([]);
+    const {currentPage, handlePageChange} = usePageParam();
 
     useEffect(() => {
         async function fetchArticles() {
@@ -16,6 +18,7 @@ export default function Article() {
                 setArticles(response.data.data);
 
                 console.log(response.data.data);
+                console.log(response.data);
             } catch (error) {
                 console.error(error);
             }
@@ -36,6 +39,8 @@ export default function Article() {
                         <DataTable
                             columns={articleColumns}
                             data={articles}
+                            page={currentPage}
+                            onPageChange={handlePageChange}
                         />
                     </div>
                 </div>

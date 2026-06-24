@@ -4,9 +4,11 @@ import DataTable from "../components/DataTable";
 import { getVouchers } from "../api/voucher.service";
 import { voucherColumns } from "../features/voucher/voucherColumns";
 import type { Voucher } from "../features/voucher/type";
+import usePageParam from "../hooks/usePageParam";
 
 export default function Voucher() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const {currentPage, handlePageChange} = usePageParam();
 
   useEffect(() => {
     async function fetchVouchers() {
@@ -16,6 +18,7 @@ export default function Voucher() {
         setVouchers(response.data.data);
 
         console.log(response.data.data);
+        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -35,6 +38,8 @@ export default function Voucher() {
             <DataTable
               columns={voucherColumns}
               data={vouchers}
+              page={currentPage}
+              onPageChange={handlePageChange}
             />
           </div>
         </div>
