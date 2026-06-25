@@ -6,7 +6,7 @@ type RetryRequestConfig = InternalAxiosRequestConfig & {
 };
 
 const BASE_URL =
-  "https://rainbow-subsidiaries-governing-trademarks.trycloudflare.com/api/v1";
+  "https://attributes-wan-apart-minister.trycloudflare.com/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,

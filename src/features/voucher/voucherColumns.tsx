@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import type { Voucher } from './type';
-import ActionCell from '../../components/ActionCell';
+import VoucherActionCell from './VoucherActionCell';
 
 function formatDate(date: string) {
   return new Date(date).toLocaleString('en-GB', {
@@ -12,107 +12,120 @@ function formatDate(date: string) {
   });
 }
 
-export const voucherColumns: ColumnDef<Voucher>[] = [
-  {
-    accessorKey: 'id',
+export function getVoucherColumns(
+  onDelete: (id: string) => void,
+): ColumnDef<Voucher>[] {
+  return [
+    {
+      accessorKey: 'id',
 
-    header: 'ID',
+      header: 'ID',
 
-    cell: ({ getValue }) => {
-      const id = getValue() as string;
+      enableSorting: false,
 
-      return (
-        <span className="break-all">
-          {id}
-        </span>
-      );
+      cell: ({ getValue }) => {
+        const id = getValue() as string;
+
+        return (
+          <span className="break-all">
+            {id}
+          </span>
+        );
+      },
     },
-  },
 
-  {
-    accessorKey: 'code',
+    {
+      accessorKey: 'code',
 
-    header: 'Code',
+      header: 'Code',
 
-    cell: ({ getValue }) => (
-      <span className="block truncate font-medium">
-        {getValue() as string}
-      </span>
-    ),
-  },
+      cell: ({ getValue }) => (
+        <span className="block truncate font-medium">
+          {getValue() as string}
+        </span>
+      ),
+    },
 
-  {
-    accessorKey: 'status',
+    {
+      accessorKey: 'status',
 
-    header: 'Status',
+      header: 'Status',
 
-    cell: ({ getValue }) => {
-      const status = getValue() as string;
+      cell: ({ getValue }) => {
+        const status = getValue() as string;
 
-      return (
-        <div className="flex items-center gap-2">
-          <div
-            className={`h-2 w-2 rounded-full
-              ${
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className={`h-2 w-2 rounded-full ${
                 status === 'active'
                   ? 'bg-[#63B32E]'
                   : 'bg-[#E53935]'
-              }
-            `}
-          />
+              }`}
+            />
 
-          <span className="capitalize">
-            {status}
-          </span>
-        </div>
-      );
+            <span className="capitalize">
+              {status}
+            </span>
+          </div>
+        );
+      },
     },
-  },
 
-  {
-    accessorKey: 'startDate',
+    {
+      accessorKey: 'startDate',
 
-    header: 'Start Date',
+      header: 'Start Date',
 
-    cell: ({ getValue }) =>
-      formatDate(getValue() as string),
-  },
+      cell: ({ getValue }) =>
+        formatDate(getValue() as string),
+    },
 
-  {
-    accessorKey: 'endDate',
+    {
+      accessorKey: 'endDate',
 
-    header: 'End Date',
+      header: 'End Date',
 
-    cell: ({ getValue }) =>
-      formatDate(getValue() as string),
-  },
+      cell: ({ getValue }) =>
+        formatDate(getValue() as string),
+    },
 
-  {
-    id: 'numberOfUse',
+    {
+      id: 'numOfUsed',
 
-    accessorKey: 'numOfUsed',
+      accessorKey: 'numOfUsed',
 
-    header: 'Number Of Use',
+      header: 'Number Of Use',
 
-    cell: ({ row }) => (
-      <span>
-        {row.original.numOfUsed}/
-        {row.original.quantityUse}
-      </span>
-    ),
-  },
+      enableSorting: false,
 
-  {
-    id: 'action',
+      cell: ({ row }) => (
+        <span>
+          {row.original.numOfUsed}/
+          {row.original.quantityUse}
+        </span>
+      ),
+    },
 
-    size: 90,
+    {
+      id: 'action',
 
-    minSize: 90,
+      size: 90,
 
-    maxSize: 90,
+      minSize: 90,
 
-    header: 'Action',
+      maxSize: 90,
 
-    cell: () => <ActionCell />,
-  },
-];
+      header: 'Action',
+
+      enableSorting: false,
+
+      cell: ({ row }) => (
+        <VoucherActionCell
+          voucherId={row.original.id}
+          onDelete={onDelete}
+        />
+      ),
+    },
+  ];
+}

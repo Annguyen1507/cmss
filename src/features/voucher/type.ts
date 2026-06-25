@@ -4,7 +4,7 @@ export type Voucher = {
   description: string;
   startDate: string;
   endDate: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "expired";
   type: string;
   amount: string;
   quantityUse: number;
@@ -16,4 +16,16 @@ export type Voucher = {
   createdAt: string;
   updatedAt: string;
   numOfUsed: string;
+};
+
+export type VoucherResponse = {
+  message: string;
+  data: Voucher[];
+  metadata: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalCount: number;
+    hasNextPage: boolean;
+  };
 };

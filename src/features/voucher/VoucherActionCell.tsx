@@ -1,6 +1,6 @@
-import { PenLine, Trash2 } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react';
 
-type ActionCellProps = {
+type VoucherActionCellProps = {
   voucherId: string;
   onDelete: (id: string) => void;
 };
@@ -8,13 +8,13 @@ type ActionCellProps = {
 export default function VoucherActionCell({
   voucherId,
   onDelete,
-}: ActionCellProps) {
+}: VoucherActionCellProps) {
   return (
     <div className="flex items-center gap-4">
       <button
         className="cursor-pointer text-[#EC4899] transition-colors hover:text-[#4B00A7]"
       >
-        <PenLine size={18} />
+        <Eye size={18} />
       </button>
 
       <button

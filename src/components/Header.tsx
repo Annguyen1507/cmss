@@ -3,11 +3,15 @@ import { Search } from 'lucide-react';
 type HeaderProps = {
     title: string;
     buttonText?: string;
+    search: string;
+    onSearchChange: (value: string) => void;
 };
 
 export default function Header({
     title,
     buttonText,
+    search,
+    onSearchChange,
 }: HeaderProps) {
     return (
         <div
@@ -27,6 +31,8 @@ export default function Header({
                 <div className="relative">
                     <input
                         placeholder="Search"
+                        value={search}
+                        onChange={(e) => onSearchChange(e.target.value)}
                         className="h-10 w-[350px] rounded-md border border-gray-300 pl-4 pr-10 text-sm outline-none focus:border-[#4B00A7] bg-gray-50"
                     />
 

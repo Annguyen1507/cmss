@@ -1,14 +1,10 @@
 import { 
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import type { ColumnDef, SortingState, } from '@tanstack/react-table';
-import { useState } from 'react';
 import {
-  ArrowDown,
   ArrowUp,
   ArrowUpDown,
   ChevronLeft,
@@ -19,18 +15,26 @@ type DataTableProps<T> = {
   data: T[];
   columns: ColumnDef<T>[];
   page: number;
+  pageSize: number;
+  totalRows: number;
+  sorting: SortingState;
   onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  onSortingChange: (sorting: SortingState) => void;
 };
 
 export default function DataTable<T>({
   data,
   columns,
   page,
+  pageSize,
+  totalRows,
+  sorting,
   onPageChange,
+  onPageSizeChange,
+  onSortingChange,
 
 }: DataTableProps<T>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [pageSize, setPageSize] = useState(25);
   const table = useReactTable({
     data,
     columns,
@@ -50,23 +54,41 @@ export default function DataTable<T>({
       },
     },
     onPaginationChange: (updater) => {
-      const next = typeof updater === 'function'
-      ? updater({ pageIndex: page - 1, pageSize })
-      : updater
-      setPageSize(next.pageSize);
-    onPageChange(next.pageIndex + 1);
-  },
-    onSortingChange: setSorting,
+      const current = {
+        pageIndex: page - 1,
+        pageSize,
+      };
+      const next =
+        typeof updater === 'function'
+          ? updater(current)
+          : updater;
+      if (next.pageSize !== pageSize) {
+        onPageSizeChange(next.pageSize);
+        onPageChange(1);
+        return;
+      }
+      onPageChange(next.pageIndex + 1);
+    },
+    onSortingChange: (updater) => {
+      const next =
+        typeof updater === 'function'
+          ? updater(sorting)
+          : updater;
+
+      onSortingChange(next);
+      onPageChange(1);
+    },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    
+    manualPagination: true,
+    manualSorting: true,
+    rowCount: totalRows,
+
   });
 
   
 
   const startRow =
-    data.length === 0
+    totalRows === 0
       ? 0
       : (page - 1) * pageSize + 1;
 
@@ -92,8 +114,7 @@ export default function DataTable<T>({
                 >
                   {headerGroup.headers.map(
                     (header) => {
-                      const sorted =
-                        header.column.getIsSorted();
+                      const isActiveSort = sorting[0]?.id === header.column.id;
 
                       const canSort =
                         header.column.getCanSort();
@@ -123,7 +144,17 @@ export default function DataTable<T>({
                                       ? 'cursor-pointer select-none'
                                       : ''
                                   }`}
-                                  onClick={header.column.getToggleSortingHandler()}
+                                onClick={() => {
+                                  if (!canSort) return;
+
+                                  if (isActiveSort) {
+                                    onSortingChange([]);
+                                  } else {
+                                    onSortingChange([{ id: header.column.id, desc: false }]);
+                                  }
+
+                                  onPageChange(1);
+                                }}
                                 >
                                   {flexRender(
                                     header.column
@@ -132,31 +163,15 @@ export default function DataTable<T>({
                                     header.getContext(),
                                   )}
 
-                                  {canSort && (
-                                    <span>
-                                      {sorted ===
-                                      'asc' ? (
-                                        <ArrowUp
-                                          size={
-                                            14
-                                          }
-                                        />
-                                      ) : sorted ===
-                                        'desc' ? (
-                                        <ArrowDown
-                                          size={
-                                            14
-                                          }
-                                        />
-                                      ) : (
-                                        <ArrowUpDown
-                                          size={
-                                            14
-                                          }
-                                        />
-                                      )}
-                                    </span>
-                                  )}
+                                {canSort && (
+                                  <span>
+                                    {isActiveSort ? (
+                                      <ArrowUp size={14} />
+                                    ) : (
+                                      <ArrowUpDown size={14} />
+                                    )}
+                                  </span>
+                                )}
                                 </div>
                               )}
                         </th>
@@ -225,7 +240,7 @@ export default function DataTable<T>({
       <div className="flex items-center justify-between border-t border-[#D8D8D8] px-6 py-4">
         <div className="text-sm text-[#666]">
           Showing {startRow} to {endRow} of{' '}
-          {data.length} entries
+          {totalRows} entries
         </div>
 
         <div className="flex items-center gap-4">
@@ -253,7 +268,7 @@ export default function DataTable<T>({
           <div className="flex items-center gap-2">
             <button
               onClick={() =>
-                onPageChange(page - 1)
+                table.previousPage()
               }
               disabled={
                 page === 1
@@ -269,7 +284,7 @@ export default function DataTable<T>({
 
             <button
               onClick={() =>
-                onPageChange(page + 1)
+                table.nextPage()
               }
               disabled={
                 !table.getCanNextPage()
