@@ -29,6 +29,10 @@ export function getArticles({
   });
 }
 
-export function deleteArticles(id: string) {
-  return api.delete(`/admins/articles/${id}`);
+export function deleteArticles(ids: string[]) {
+  return api.delete(`/admins/articles`, {
+    data: {
+      ids,
+    },
+  });
 }

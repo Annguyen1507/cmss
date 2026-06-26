@@ -5,6 +5,7 @@ type HeaderProps = {
     buttonText?: string;
     search: string;
     onSearchChange: (value: string) => void;
+    onButtonClick?: () => void;
 };
 
 export default function Header({
@@ -12,6 +13,7 @@ export default function Header({
     buttonText,
     search,
     onSearchChange,
+    onButtonClick,
 }: HeaderProps) {
     return (
         <div
@@ -48,6 +50,8 @@ export default function Header({
             >
                 {buttonText && (
                     <button
+                        type="button"
+                        onClick={onButtonClick}
                         className="h-10 rounded-md bg-[#4B00A7] px-5 text-sm font-medium text-white transition-colors hover:bg-[#3D0088] cursor-pointer"
                     >
                         {buttonText}

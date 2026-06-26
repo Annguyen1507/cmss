@@ -7,6 +7,7 @@ import type { Article } from '../features/article/type';
 import usePageParam from '../hooks/usePageParam';
 import useDebouncedSearch from '../hooks/useDebouncedSearch';
 import type { SortingState } from '@tanstack/react-table';
+import DeleteModal from '../components/DeleteModal';
 
 export default function Article() {
       const [articles, setArticles] = useState<Article[]>([]);
@@ -15,7 +16,9 @@ export default function Article() {
       const [pageSize, setPageSize] = useState(25);
       const [sorting, setSorting] = useState<SortingState>([]);
       const [search, setSearch] = useState('');
+      const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
       const debouncedSearch = useDebouncedSearch(search);
+
     useEffect(() => {
         async function fetchArticles() {
             try {
@@ -38,9 +41,20 @@ export default function Article() {
         fetchArticles();
     }, [currentPage, pageSize, debouncedSearch, sorting]);
 
-    async function handleDeleteArticle(id: string) {
+    function handleOpenDeleteModal(id: string) {
+        const selectedArticle = articles.find(
+            (article) => article.id === id,
+        );
+
+        if (!selectedArticle) return;
+
+        setArticleToDelete(selectedArticle);
+    }
+
+    async function handleDeleteArticle() {
+        if (!articleToDelete) return;
         try {
-          await deleteArticles(id);
+          await deleteArticles([articleToDelete.id]);
     
           const response = await getArticles({
             page: currentPage,
@@ -51,6 +65,7 @@ export default function Article() {
     
           setArticles(response.data.data);
           setTotalRows(response.data.metadata.totalCount);
+          setArticleToDelete(null);
         } catch (error) {
           console.error(error);
         }
@@ -73,13 +88,13 @@ export default function Article() {
 
   }
 
-  const columns = getArticleColumns(handleDeleteArticle);
+  const columns = getArticleColumns(handleOpenDeleteModal);
     return (
         <>
             <div className="flex h-full flex-col">
                 <Header
-                    title="Voucher"
-                    buttonText="Create Voucher"
+                    title="Article"
+                    buttonText="Create Article"
                     search={search}
                     onSearchChange={handleSearchChange}
                 />
@@ -98,6 +113,18 @@ export default function Article() {
                         />
                     </div>
                 </div>
+                {articleToDelete && (
+
+                <DeleteModal
+                    title={articleToDelete.title}
+                    onCancel={() =>
+                        setArticleToDelete(null)
+                    }
+                    onConfirm={handleDeleteArticle}
+                />
+
+            )}
+
             </div>
         </>
     );

@@ -1,12 +1,12 @@
 import { PenLine, Trash2 } from 'lucide-react';
 
 type ActionCellProps = {
-  voucherId: string;
+  articleId: string;
   onDelete: (id: string) => void;
 };
 
-export default function VoucherActionCell({
-  voucherId,
+export default function ActionCell({
+  articleId,
   onDelete,
 }: ActionCellProps) {
   return (
@@ -18,7 +18,7 @@ export default function VoucherActionCell({
       </button>
 
       <button
-        onClick={() => onDelete(voucherId)}
+        onClick={() => onDelete(articleId)}
         className="cursor-pointer text-[#6E6E6E] transition-colors hover:text-[#E53935]"
       >
         <Trash2 size={18} />

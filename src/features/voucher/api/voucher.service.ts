@@ -8,6 +8,19 @@ type getVouchersParams = {
   sorting?: SortingState;
 };
 
+type createVouchersParams = {
+  code: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  status: "active" | "inactive" | "expired";
+  type: "fixed" | "percent";
+  amount: number;
+  quantityUse: number;
+  minPayAmount: number;
+  maxDiscountAmount: number;
+};
+
 export function getVouchers({
   page,
   limit,
@@ -29,6 +42,26 @@ export function getVouchers({
   });
 }
 
-export function deleteVouchers(id: string) {
-  return api.delete(`/admins/vouchers/${id}`);
+export function createVouchers({
+  code,
+  description,
+  startDate,
+  endDate,
+  status,
+  type,
+  amount,
+  minPayAmount,
+  maxDiscountAmount,
+}: createVouchersParams) {
+  return api.post("/admins/vouchers", {
+    code,
+    description,
+    startDate,
+    endDate,
+    status,
+    type,
+    amount,
+    minPayAmount,
+    maxDiscountAmount,
+  });
 }

@@ -25,8 +25,8 @@ export function getArticleColumns(
         const id = getValue() as string;
 
         return (
-          <span title={id}>
-            {id.slice(0, 18)}...
+          <span>
+            {id}
           </span>
         );
       },
@@ -107,7 +107,7 @@ export function getArticleColumns(
 
       cell: ({ row }) => (
         <ActionCell
-          voucherId={row.original.id}
+          articleId={row.original.id}
           onDelete={onDelete}
         />
       ),

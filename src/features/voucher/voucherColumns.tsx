@@ -12,11 +12,8 @@ function formatDate(date: string) {
   });
 }
 
-export function getVoucherColumns(
-  onDelete: (id: string) => void,
-): ColumnDef<Voucher>[] {
-  return [
-    {
+export const voucherColumns: ColumnDef<Voucher>[] = [
+  {
       accessorKey: 'id',
 
       header: 'ID',
@@ -27,7 +24,7 @@ export function getVoucherColumns(
         const id = getValue() as string;
 
         return (
-          <span className="break-all">
+          <span>
             {id}
           </span>
         );
@@ -97,8 +94,6 @@ export function getVoucherColumns(
 
       header: 'Number Of Use',
 
-      enableSorting: false,
-
       cell: ({ row }) => (
         <span>
           {row.original.numOfUsed}/
@@ -120,12 +115,6 @@ export function getVoucherColumns(
 
       enableSorting: false,
 
-      cell: ({ row }) => (
-        <VoucherActionCell
-          voucherId={row.original.id}
-          onDelete={onDelete}
-        />
-      ),
-    },
+      cell: () => <VoucherActionCell />
+      },
   ];
-}

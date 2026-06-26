@@ -95,8 +95,8 @@ export default function DataTable<T>({
   const endRow = Math.min((page) * pageSize, data.length);
 
   return (
-    <div className="overflow-hidden rounded-sm border border-[#D8D8D8] bg-white">
-      <div className="overflow-x-auto">
+    <div className="flex h-[calc(100vh-120px)] flex-col overflow-hidden rounded-sm border border-[#D8D8D8] bg-white">
+      <div className="min-h-0 flex-1 overflow-auto">
         <table
           className="border-separate border-spacing-0 text-[15px]"
           style={{
@@ -207,11 +207,13 @@ export default function DataTable<T>({
                           maxWidth:
                             cell.column.getSize(),
                           overflow:
-                            'hidden',
+                            cell.column.id === 'id' ? 'visible' : 'hidden',
                           textOverflow:
-                            'ellipsis',
+                            cell.column.id === 'id' ? 'clip' : 'ellipsis',
                           whiteSpace:
-                            'nowrap',
+                            cell.column.id === 'id' ? 'normal' : 'nowrap',
+                          wordBreak:
+                            cell.column.id === 'id' ? 'break-all' : 'normal',
                         }}
                         className={`border-b border-r border-[#D9D9D9] px-6 align-middle text-[15px] text-[#2F2F2F] ${
                           cell.column.getIsPinned() ===
@@ -237,7 +239,7 @@ export default function DataTable<T>({
         </table>
       </div>
 
-      <div className="flex items-center justify-between border-t border-[#D8D8D8] px-6 py-4">
+      <div className="shrink-0 flex items-center justify-between border-t border-[#D8D8D8] px-6 py-4">
         <div className="text-sm text-[#666]">
           Showing {startRow} to {endRow} of{' '}
           {totalRows} entries
