@@ -1,3 +1,5 @@
+import type { SortingState } from "@tanstack/react-table";
+
 export type Voucher = {
   id: string;
   code: string;
@@ -29,3 +31,41 @@ export type VoucherResponse = {
     hasNextPage: boolean;
   };
 };
+
+export type DoulaVoucher = {
+  id: string;
+  doulaId: string;
+  voucherId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  doulaUser: {
+    id: string;
+    fullName: string;
+    firstName: string;
+    middleName: string | null;
+    lastName: string;
+    picture: string | null;
+  };
+};
+
+export type DoulaVoucherResponse = {
+  message: string;
+  data: DoulaVoucher[];
+  metadata: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalCount: number;
+    hasNextPage: boolean;
+  };
+};
+
+export type GetDoulaVouchersProps = {
+  voucherId: string;
+  page: number;
+  limit: number;
+  sorting?: SortingState;
+};
+
+

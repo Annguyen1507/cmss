@@ -14,6 +14,7 @@ function formatDate(date: string) {
 
 export function getArticleColumns(
   onDelete: (id: string) => void,
+  onEdit: (id: string) => void,
 ): ColumnDef<Article>[] {
   return [
     {
@@ -109,6 +110,7 @@ export function getArticleColumns(
         <ActionCell
           articleId={row.original.id}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       ),
     },

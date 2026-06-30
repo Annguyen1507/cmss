@@ -1,10 +1,18 @@
 import { Eye, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function VoucherActionCell() {
+type VoucherActionCellProps = {
+  voucherId: string;
+};
+
+
+export default function VoucherActionCell({ voucherId}: VoucherActionCellProps) {
+  const navigate = useNavigate();
   return (
     <div className="flex items-center gap-4">
       <button
         className="cursor-pointer text-[#EC4899] transition-colors hover:text-[#4B00A7]"
+        onClick={() => navigate(`/voucher/${voucherId}`)}
       >
         <Eye size={18} />
       </button>

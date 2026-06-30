@@ -9,10 +9,11 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Voucher = lazy(() => import('./pages/Voucher'));
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
 const Article = lazy(() => import('./pages/Article'));
+const VoucherDetail = lazy(() => import('./features/voucher/VoucherDetail'));
 
 export default function App() {
   const token = localStorage.getItem('accessToken');
-  
+
   return (
     <Suspense
       fallback={<div>Loading...</div>}
@@ -42,33 +43,41 @@ export default function App() {
         />
         <Route
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <DashboardLayout />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         >
           <Route
             path="/dashboard"
             element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <Dashboard />
-              // </ProtectedRoute>
-              }
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/voucher"
             element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <Voucher />
-              // </ProtectedRoute>
-              }
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/voucher/:id"
+            element={
+              <ProtectedRoute>
+                <VoucherDetail />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/article"
             element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <Article />
-              // </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
         </Route>

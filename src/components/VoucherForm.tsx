@@ -7,7 +7,7 @@ export type VoucherFormValues = {
   startDate: string;
   endDate: string;
   status: 'active' | 'inactive' | 'expired';
-  type: 'fixed' | 'percent';
+  type: 'fixed' | 'percentage';
   amount: number;
   quantityUse: number;
   minPayAmount: number;
@@ -24,8 +24,9 @@ type FormValues = {
   description: string;
   startDate: string;
   endDate: string;
-  type: 'fixed' | 'percent' | '';
+  type: 'fixed' | 'percentage' | '';
   amount: string;
+  quantityUse: string;
   minPayAmount: string;
   maxDiscountAmount: string;
 };
@@ -47,6 +48,7 @@ export default function VoucherForm({
       endDate: '',
       type: '',
       amount: '',
+      quantityUse: '',
       minPayAmount: '',
       maxDiscountAmount: '',
     },
@@ -65,7 +67,7 @@ export default function VoucherForm({
       status: 'active',
       type: values.type,
       amount: Number(values.amount),
-      quantityUse: 6767,
+      quantityUse: Number(values.quantityUse),
       minPayAmount: Number(values.minPayAmount),
       maxDiscountAmount: Number(values.maxDiscountAmount),
     });
@@ -180,6 +182,26 @@ export default function VoucherForm({
 
             <div>
               <label className="mb-1.5 block text-[16px] text-[#111]">
+                Quantity <span className="text-[#E53935]">*</span>
+              </label>
+
+              <input
+                {...register('quantityUse', {
+                  required: 'Quantity is required',
+                })}
+                type="number"
+                placeholder="Description"
+                className="h-[48px] w-full rounded-md border border-[#BDBDBD] px-4 text-[16px] outline-none placeholder:text-[#B7B7B7] focus:border-[#4B00A7]"
+              />
+              {errors.quantityUse && (
+                <p className="mt-1 text-sm text-[#E53935]">
+                  {errors.quantityUse.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-[16px] text-[#111]">
                 Type of coupon <span className="text-[#E53935]">*</span>
               </label>
 
@@ -192,7 +214,7 @@ export default function VoucherForm({
                 >
                   <option value="" disabled>Select</option>
                   <option value="fixed">Fixed</option>
-                  <option value="percent">Percent</option>
+                  <option value="percentage">Percentage</option>
                 </select>
 
                 <div className="pointer-events-none absolute right-0 top-1/2 flex h-8 w-12 -translate-y-1/2 items-center justify-center border-l border-[#D8D8D8]">

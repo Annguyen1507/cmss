@@ -115,6 +115,6 @@ export const voucherColumns: ColumnDef<Voucher>[] = [
 
       enableSorting: false,
 
-      cell: () => <VoucherActionCell />
+      cell: ({ row }) => <VoucherActionCell voucherId={row.original.id} />
       },
   ];

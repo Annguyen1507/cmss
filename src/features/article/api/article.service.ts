@@ -1,5 +1,6 @@
 import type { SortingState } from "@tanstack/react-table";
 import api from "../../../api/axios";
+import type { ArticleFormValues } from "../../../components/ArticleForm";
 
 type getArticlesParams = {
   page: number;
@@ -7,6 +8,17 @@ type getArticlesParams = {
   search?: string;
   sorting?: SortingState;
 };
+
+type createArticlesParams = {
+  title: string,
+  content: string,
+  picture: string,
+  status: "published" | "unpublished" | "draft",
+  type: "article" | "pd";
+  timeToRead: number,
+  author: string,
+  categoryId: string,
+}
 
 export function getArticles({
   page,
@@ -35,4 +47,40 @@ export function deleteArticles(ids: string[]) {
       ids,
     },
   });
+}
+
+export function createArticles({
+ title,
+ content,
+ picture,
+ status,
+ type,
+ timeToRead,
+ author,
+ categoryId,
+}: createArticlesParams) {
+  return api.post("/admins/articles", {
+    title,
+    content,
+    picture,
+    status,
+    type,
+    timeToRead,
+    author,
+    categoryId,
+  });
+}
+
+export function updateArticle(
+    id: string,
+    data: ArticleFormValues,
+) {
+    return api.put(
+        `/admins/articles/${id}`,
+        data,
+    );
+}
+
+export function getArticleById(id: string) {
+  return api.get(`/admins/articles/${id}`);
 }

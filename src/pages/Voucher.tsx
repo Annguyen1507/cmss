@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import DataTable from "../components/DataTable";
-import { getVouchers, createVouchers } from "../features/voucher/api/voucher.service";
+import { getVouchers, createVouchers, getVoucherById } from "../features/voucher/api/voucher.service";
 import { voucherColumns } from "../features/voucher/voucherColumns";
 import type { Voucher } from "../features/voucher/type";
 import type { SortingState } from "@tanstack/react-table";
@@ -53,6 +53,22 @@ export default function Voucher() {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+  async function test() {
+    try {
+      const response = await getVoucherById(
+        "00b77b4a-244e-4cc8-9198-29a5d5db623a"
+      );
+
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  test();
+}, []);
 
   function handleSearchChange(value: string) {
     setSearch(value);

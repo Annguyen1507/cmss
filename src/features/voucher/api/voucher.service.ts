@@ -14,7 +14,7 @@ type createVouchersParams = {
   startDate: string;
   endDate: string;
   status: "active" | "inactive" | "expired";
-  type: "fixed" | "percent";
+  type: "fixed" | "percentage";
   amount: number;
   quantityUse: number;
   minPayAmount: number;
@@ -42,6 +42,10 @@ export function getVouchers({
   });
 }
 
+export function getVoucherById(id: string) {
+  return api.get(`/admins/vouchers/${id}`);
+}
+
 export function createVouchers({
   code,
   description,
@@ -50,6 +54,7 @@ export function createVouchers({
   status,
   type,
   amount,
+  quantityUse,
   minPayAmount,
   maxDiscountAmount,
 }: createVouchersParams) {
@@ -61,7 +66,34 @@ export function createVouchers({
     status,
     type,
     amount,
+    quantityUse,
     minPayAmount,
     maxDiscountAmount,
+  });
+}
+
+type getDoulaVouchersprops = {
+  voucherId: string;
+  page: number;
+  limit: number;
+  sorting?: SortingState;
+};
+
+export function getDoulaVouchers({
+  voucherId,
+  page,
+  limit,
+  sorting = [],
+}: getDoulaVouchersprops) {
+  const sort = sorting?.[0];
+  return api.get("/admins/doula-vouchers", {
+    params: {
+      f_voucherId: voucherId,
+      page,
+      limit,
+      ...(sort && {
+        sort: sort.id,
+      }),
+    },
   });
 }
