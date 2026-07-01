@@ -1,4 +1,4 @@
-export type Article = {
+export type Session = {
   id: string;
   title: string;
   author: string;
@@ -9,13 +9,13 @@ export type Article = {
   createdAt: string;
 };
 
-export type ArticleDetail = {
+export type SessionDetail = {
   id: string;
   title: string;
   content: string;
   picture: string;
   status: "draft" | "published" | "unpublished";
-  type: "article";
+  type: "pd";
   timeToRead: number;
   author: string;
   categoryId: string;

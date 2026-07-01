@@ -20,6 +20,18 @@ export type Voucher = {
   numOfUsed: string;
 };
 
+export type VoucherStatus =  {
+  code: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  status: "active" | "inactive" | "expired";
+  type: string;
+  amount: number;
+  minPayAmount: number;
+  maxDiscountAmount: number;
+}
+
 export type VoucherResponse = {
   message: string;
   data: Voucher[];

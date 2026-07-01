@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 
 type VoucherActionCellProps = {
   voucherId: string;
+  onPatch: (id: string) => void;
 };
 
 
-export default function VoucherActionCell({ voucherId}: VoucherActionCellProps) {
+export default function VoucherActionCell({ voucherId, onPatch }: VoucherActionCellProps) {
   const navigate = useNavigate();
   return (
     <div className="flex items-center gap-4">
@@ -19,6 +20,7 @@ export default function VoucherActionCell({ voucherId}: VoucherActionCellProps) 
 
       <button
         className="cursor-pointer text-[#6E6E6E] transition-colors hover:text-[#E53935]"
+        onClick={() => onPatch(voucherId)}
       >
         <Trash2 size={18} />
       </button>

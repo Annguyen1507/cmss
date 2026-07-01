@@ -1,31 +1,31 @@
 import type { SortingState } from "@tanstack/react-table";
 import api from "../../../api/axios";
-import type { ArticleFormValues } from "../../../components/ArticleForm";
+import type { SessionFormValues } from "../../../components/SessionForm";
 
-type getArticlesParams = {
+type getSessionsParams = {
   page: number;
   limit: number;
   search?: string;
   sorting?: SortingState;
 };
 
-type createArticlesParams = {
+type createSessionsParams = {
   title: string,
   content: string,
   picture: string,
   status: "published" | "unpublished" | "draft",
-  type: "article";
+  type: "pd";
   timeToRead: number,
   author: string,
   categoryId: string,
 }
 
-export function getArticles({
+export function getSessions({
   page,
   limit,
   search = "",
   sorting = [],
-}: getArticlesParams) {
+}: getSessionsParams) {
   const sort = sorting[0];
   return api.get("/admins/articles", {
     params: {
@@ -41,7 +41,7 @@ export function getArticles({
   });
 }
 
-export function deleteArticles(ids: string[]) {
+export function deleteSessions(ids: string[]) {
   return api.delete(`/admins/articles`, {
     data: {
       ids,
@@ -49,7 +49,7 @@ export function deleteArticles(ids: string[]) {
   });
 }
 
-export function createArticles({
+export function createSessions({
  title,
  content,
  picture,
@@ -58,7 +58,7 @@ export function createArticles({
  timeToRead,
  author,
  categoryId,
-}: createArticlesParams) {
+}: createSessionsParams) {
   return api.post("/admins/articles", {
     title,
     content,
@@ -71,9 +71,9 @@ export function createArticles({
   });
 }
 
-export function updateArticle(
+export function updateSessions(
     id: string,
-    data: ArticleFormValues,
+    data: SessionFormValues,
 ) {
     return api.put(
         `/admins/articles/${id}`,
@@ -81,6 +81,6 @@ export function updateArticle(
     );
 }
 
-export function getArticleById(id: string) {
+export function getSessionById(id: string) {
   return api.get(`/admins/articles/${id}`);
 }

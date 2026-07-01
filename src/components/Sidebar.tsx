@@ -40,7 +40,7 @@
             const Icon = item.icon;
 
             const isActive =
-              location.pathname === item.path;
+              location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
 
             return (
               <button

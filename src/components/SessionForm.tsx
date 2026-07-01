@@ -3,23 +3,23 @@ import { useForm } from "react-hook-form";
 import { getCategories } from "../features/category/api/category.service";
 import { useEffect, useState } from "react";
 import type { Category } from "../features/category/type";
-import type { ArticleDetail } from "../features/article/type";
+import type { SessionDetail } from "../features/pd_session/type";
 
-export type ArticleFormValues = {
+export type SessionFormValues = {
     title: string;
     content: string;
     picture: string;
     status: "published" | "unpublished" | "draft";
-    type: "article";
+    type: "pd";
     timeToRead: number;
     author: string;
     categoryId: string;
 };
 
-type ArticleFormProps = {
-    article?: ArticleDetail;
+type SessionFormProps = {
+    session?: SessionDetail;
     onClose: () => void;
-    onSubmit: (values: ArticleFormValues) => void | Promise<void>;
+    onSubmit: (values: SessionFormValues) => void | Promise<void>;
 };
 
 type FormValues = {
@@ -32,7 +32,7 @@ type FormValues = {
     categoryId: string;
 };
 
-export default function ArticleForm({ article, onClose, onSubmit }: ArticleFormProps) {
+export default function SessionForm({ session, onClose, onSubmit }: SessionFormProps) {
     const [categories, setCategories] = useState<Category[]>([]);
     const default_image =
         "https://s3.ap-southeast-1.amazonaws.com/nurturewave-be-dev/uploads%2Fimages%2F0b8821d6-1a35-4986-af30-232f74a04b51_download+(2).jpeg";
@@ -47,22 +47,22 @@ export default function ArticleForm({ article, onClose, onSubmit }: ArticleFormP
     } = useForm<FormValues>({
         defaultValues: {
             title:
-                article?.title ?? "",
+                session?.title ?? "",
 
             author:
-                article?.author ?? "",
+                session?.author ?? "",
 
             content:
-                article?.content ?? "",
+                session?.content ?? "",
 
             status:
-                article?.status ?? "",
+                session?.status ?? "",
 
             categoryId:
-                article?.categoryId ?? "",
+                session?.categoryId ?? "",
 
             timeToRead:
-                article?.timeToRead?.toString() ?? "",
+                session?.timeToRead?.toString() ?? "",
 
             picture:
                 default_image,
@@ -82,19 +82,19 @@ export default function ArticleForm({ article, onClose, onSubmit }: ArticleFormP
         fetchCategories();
     }, []);
 
-    // useEffect(() => {
-    //     if (!article) return;
+    useEffect(() => {
+        if (!session) return;
 
-    //     reset({
-    //         title: article.title,
-    //         author: article.author,
-    //         content: article.content,
-    //         status: article.status,
-    //         categoryId: article.categoryId,
-    //         timeToRead: article.timeToRead.toString(),
-    //         picture: default_image,
-    //     });
-    // }, [article, reset]);
+        reset({
+            title: session.title,
+            author: session.author,
+            content: session.content,
+            status: session.status,
+            categoryId: session.categoryId,
+            timeToRead: session.timeToRead.toString(),
+            picture: default_image,
+        });
+    }, [session, reset]);
 
     const status = watch("status");
     const selectedCategory = watch("categoryId");
@@ -111,7 +111,7 @@ export default function ArticleForm({ article, onClose, onSubmit }: ArticleFormP
             content: values.content,
             picture: values.picture,
             status: values.status,
-            type: "article",
+            type: "pd",
             timeToRead: Number(values.timeToRead),
             author: values.author,
             categoryId: values.categoryId,
@@ -126,7 +126,7 @@ export default function ArticleForm({ article, onClose, onSubmit }: ArticleFormP
             >
                 <div className="flex h-[68px] items-center justify-between border-b border-[#D8D8D8] px-6">
                     <h2 className="text-[22px] font-medium text-[#111]">
-                        {article ? "Edit Article" : "Create Article"}
+                        {session ? "Edit PD session" : "Create PD session"}
                     </h2>
 
                     <button
@@ -310,10 +310,10 @@ export default function ArticleForm({ article, onClose, onSubmit }: ArticleFormP
                         className="h-[44px] w-full cursor-pointer rounded-md bg-[#4B00A7] text-[16px] font-semibold text-white transition hover:bg-[#3d0088] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {isSubmitting
-                            ? article
+                            ? session
                                 ? "Updating..."
                                 : "Creating..."
-                            : article
+                            : session
                                 ? "Update"
                                 : "Create"}
                     </button>

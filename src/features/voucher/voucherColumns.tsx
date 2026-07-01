@@ -11,8 +11,10 @@ function formatDate(date: string) {
     minute: '2-digit',
   });
 }
-
-export const voucherColumns: ColumnDef<Voucher>[] = [
+export function getVoucherColumns(
+  onPatch: (id: string) => void
+): ColumnDef<Voucher>[] {
+  return [
   {
       accessorKey: 'id',
 
@@ -115,6 +117,7 @@ export const voucherColumns: ColumnDef<Voucher>[] = [
 
       enableSorting: false,
 
-      cell: ({ row }) => <VoucherActionCell voucherId={row.original.id} />
+      cell: ({ row }) => <VoucherActionCell voucherId={row.original.id} onPatch={onPatch} />
       },
   ];
+}

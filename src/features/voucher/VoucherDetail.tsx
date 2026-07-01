@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import type { SortingState } from "@tanstack/react-table";
 import { getVoucherById, getDoulaVouchers } from "./api/voucher.service";
 import { doulaVoucherColumns } from "../doulaVoucherColumns";
-import DataTable from "../../components/DataTable";
+import DetailDataTable from "../../components/DetailDataTable";
 import type { Voucher, DoulaVoucher } from "./type";
 
 function formatDate(date: string) {
@@ -68,7 +68,7 @@ export default function VoucherDetail() {
   }
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full overflow-y-auto flex-col p-6">
       <button
         onClick={() => navigate(-1)}
         className="mb-4 flex w-fit cursor-pointer items-center gap-2 text-[#2F2F2F]"
@@ -80,7 +80,7 @@ export default function VoucherDetail() {
       <div className="rounded-sm border border-[#D8D8D8] bg-white p-6">
         <h2 className="mb-4 text-lg font-semibold">Voucher Information</h2>
 
-        <div className="grid grid-cols-4 gap-y-6 text-[15px]">
+        <div className="flex flex-wrap gap-x-10 gap-y-6 text-[15px]">
           <Field label="Code" value={voucher.code} />
           <Field label="Start Date" value={formatDate(voucher.startDate)} />
           <Field label="End Date" value={formatDate(voucher.endDate)} />
@@ -107,7 +107,7 @@ export default function VoucherDetail() {
       </div>
 
       <div className="mt-6">
-        <DataTable
+        <DetailDataTable
           columns={doulaVoucherColumns}
           data={doulaVouchers}
           page={page}
@@ -125,9 +125,9 @@ export default function VoucherDetail() {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="whitespace-nowrap">
       <div className="text-[#666]">{label}</div>
-      <div className="font-medium">{value}</div>
+      <div className="font-bold text-black">{value}</div>
     </div>
   );
 }

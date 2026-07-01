@@ -1,39 +1,39 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import DataTable from '../components/DataTable';
-import { getArticles, deleteArticles, createArticles, getArticleById, updateArticle } from "../features/article/api/article.service";
-import { getArticleColumns } from '../features/article/articleColumns';
-import type { Article, ArticleDetail } from '../features/article/type';
+import { getSessions, deleteSessions, createSessions, getSessionById, updateSessions } from "../features/pd_session/api/pdsession.service";
+import { getSessionColumns } from '../features/pd_session/sessionColumns';
+import type { Session, SessionDetail } from "../features/pd_session/type"
 import usePageParam from '../hooks/usePageParam';
 import useDebouncedSearch from '../hooks/useDebouncedSearch';
 import type { SortingState } from '@tanstack/react-table';
 import DeleteModal from '../components/DeleteModal';
-import ArticleForm from '../components/ArticleForm';
-import type { ArticleFormValues } from '../components/ArticleForm';
+import SessionForm from '../components/SessionForm';
+import type { SessionFormValues } from '../components/SessionForm';
 
-export default function Article() {
-    const [articles, setArticles] = useState<Article[]>([]);
+export default function PDsession() {
+    const [sessions, setSessions] = useState<Session[]>([]);
     const { currentPage, handlePageChange } = usePageParam();
     const [totalRows, setTotalRows] = useState(0);
     const [pageSize, setPageSize] = useState(25);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [search, setSearch] = useState('');
-    const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
+    const [sessionToDelete, setSessionsToDelete] = useState<Session | null>(null);
     const debouncedSearch = useDebouncedSearch(search);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [editingArticle, setEditingArticle] = useState<ArticleDetail | null>(null);
+    const [editingSession, setEditingSession] = useState<SessionDetail | null>(null);
 
 
-    async function fetchArticles() {
+    async function fetchSessions() {
         try {
-            const response = await getArticles({
+            const response = await getSessions({
                 page: currentPage,
                 limit: pageSize,
                 search: debouncedSearch,
                 sorting,
             });
 
-            setArticles(response.data.data);
+            setSessions(response.data.data);
             setTotalRows(response.data.metadata.totalCount);
             console.log(response.data.data);
             console.log(response.data);
@@ -42,14 +42,14 @@ export default function Article() {
         }
     }
     useEffect(() => {
-        fetchArticles();
+        fetchSessions();
     }, [currentPage, pageSize, debouncedSearch, sorting]);
 
-    async function handleCreateArticle(values: ArticleFormValues) {
+    async function handleCreateSession(values: SessionFormValues) {
         try {
-            await createArticles(values);
+            await createSessions(values);
 
-            await fetchArticles();
+            await fetchSessions();
 
             setShowCreateForm(false);
         } catch (error) {
@@ -57,59 +57,59 @@ export default function Article() {
         }
     }
 
-    async function handleUpdateArticle(
-        values: ArticleFormValues,
+    async function handleUpdateSession(
+        values: SessionFormValues,
     ) {
-        if (!editingArticle) return;
+        if (!editingSession) return;
 
         try {
-            await updateArticle(editingArticle.id, values);
+            await updateSessions(editingSession.id, values);
 
-            await fetchArticles();
+            await fetchSessions();
 
-            setEditingArticle(null);
+            setEditingSession(null);
         } catch (error) {
             console.error(error);
         }
     }
 
     function handleOpenDeleteModal(id: string) {
-        const selectedArticle = articles.find(
-            (article) => article.id === id,
+        const selectedSession = sessions.find(
+            (session) => session.id === id,
         );
 
-        if (!selectedArticle) return;
+        if (!selectedSession) return;
 
-        setArticleToDelete(selectedArticle);
+        setSessionsToDelete(selectedSession);
     }
 
     async function handleOpenEditModal(id: string) {
         try {
             const response =
-                await getArticleById(id);
+                await getSessionById(id);
 
-            setEditingArticle(
+            setEditingSession(
                 response.data.data,
             );
         } catch (error) {
             console.error(error);
         }
     }
-    async function handleDeleteArticle() {
-        if (!articleToDelete) return;
+    async function handleDeleteSession() {
+        if (!sessionToDelete) return;
         try {
-            await deleteArticles([articleToDelete.id]);
+            await deleteSessions([sessionToDelete.id]);
 
-            const response = await getArticles({
+            const response = await getSessions({
                 page: currentPage,
                 limit: pageSize,
                 search: debouncedSearch,
                 sorting,
             });
 
-            setArticles(response.data.data);
+            setSessions(response.data.data);
             setTotalRows(response.data.metadata.totalCount);
-            setArticleToDelete(null);
+            setSessionsToDelete(null);
         } catch (error) {
             console.error(error);
         }
@@ -132,13 +132,13 @@ export default function Article() {
 
     }
 
-    const columns = getArticleColumns(handleOpenDeleteModal, handleOpenEditModal);
+    const columns = getSessionColumns(handleOpenDeleteModal, handleOpenEditModal);
     return (
         <>
             <div className="flex h-full flex-col">
                 <Header
-                    title="Article"
-                    buttonText="Create Article"
+                    title="PD Session"
+                    buttonText="Create PD Session"
                     search={search}
                     onSearchChange={handleSearchChange}
                     onButtonClick={() => setShowCreateForm(true)}
@@ -147,7 +147,7 @@ export default function Article() {
                     <div className="h-full overflow-y-auto rounded-sm bg-white">
                         <DataTable
                             columns={columns}
-                            data={articles}
+                            data={sessions}
                             page={currentPage}
                             pageSize={pageSize}
                             totalRows={totalRows}
@@ -158,30 +158,30 @@ export default function Article() {
                         />
                     </div>
                 </div>
-                {articleToDelete && (
+                {sessionToDelete && (
 
                     <DeleteModal
-                        title={"Delete Article?"}
+                        title={"Delete PD Session?"}
                         onCancel={() =>
-                            setArticleToDelete(null)
+                            setSessionsToDelete(null)
                         }
-                        onConfirm={handleDeleteArticle}
+                        onConfirm={handleDeleteSession}
                     />
 
                 )}
 
                 {showCreateForm && (
-                    <ArticleForm
+                    <SessionForm
                         onClose={() => setShowCreateForm(false)}
-                        onSubmit={handleCreateArticle}
+                        onSubmit={handleCreateSession}
                     />
                 )}
 
-                {editingArticle && (
-                    <ArticleForm
-                        article={editingArticle}
-                        onClose={() => setEditingArticle(null)}
-                        onSubmit={handleUpdateArticle}
+                {editingSession && (
+                    <SessionForm
+                        session={editingSession}
+                        onClose={() => setEditingSession(null)}
+                        onSubmit={handleUpdateSession}
                     />
                 )}
 

@@ -10,6 +10,7 @@ const Voucher = lazy(() => import('./pages/Voucher'));
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
 const Article = lazy(() => import('./pages/Article'));
 const VoucherDetail = lazy(() => import('./features/voucher/VoucherDetail'));
+const PDsession = lazy(() => import('./pages/PDsession'));
 
 export default function App() {
   const token = localStorage.getItem('accessToken');
@@ -77,6 +78,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Article />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/session"
+            element={
+              <ProtectedRoute>
+                <PDsession />
               </ProtectedRoute>
             }
           />

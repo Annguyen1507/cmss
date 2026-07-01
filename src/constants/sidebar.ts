@@ -29,7 +29,7 @@ export const sidebarItems = [
   {
     label: "PD Session",
     icon: Newspaper,
-    path: "/pd-session",
+    path: "/session",
   },
   {
     label: "Category",

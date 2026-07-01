@@ -1,5 +1,6 @@
 import type { SortingState } from "@tanstack/react-table";
 import api from "../../../api/axios";
+import type { VoucherFormValues } from "../../../components/VoucherForm";
 
 type getVouchersParams = {
   page: number;
@@ -97,3 +98,14 @@ export function getDoulaVouchers({
     },
   });
 }
+
+export function patchVouchers(
+  id: string,
+  data: VoucherFormValues,
+) {
+  return api.put(
+    `/admins/vouchers/${id}`,
+        data,
+  )
+}
+

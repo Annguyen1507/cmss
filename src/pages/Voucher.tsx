@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import DataTable from "../components/DataTable";
-import { getVouchers, createVouchers, getVoucherById } from "../features/voucher/api/voucher.service";
-import { voucherColumns } from "../features/voucher/voucherColumns";
+import { getVouchers, createVouchers, getVoucherById, patchVouchers } from "../features/voucher/api/voucher.service";
+import { getVoucherColumns } from "../features/voucher/voucherColumns";
 import type { Voucher } from "../features/voucher/type";
 import type { SortingState } from "@tanstack/react-table";
 import usePageParam from "../hooks/usePageParam";
 import useDebouncedSearch from "../hooks/useDebouncedSearch";
 import VoucherForm from "../components/VoucherForm";
 import type { VoucherFormValues } from "../components/VoucherForm";
+import { useParams } from "react-router-dom";
 
 export default function Voucher() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
@@ -19,6 +20,8 @@ export default function Voucher() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedSearch(search);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingVoucher, setEditingVoucher] = useState<VoucherFormValues | null>(null);
+  const { id } = useParams<{ id: string }>();
 
   async function fetchVouchers() {
     try {
@@ -54,21 +57,46 @@ export default function Voucher() {
     }
   }
 
-  useEffect(() => {
-  async function test() {
+  async function handlePatchVoucherStatus(voucherId: string) {
     try {
-      const response = await getVoucherById(
-        "00b77b4a-244e-4cc8-9198-29a5d5db623a"
-      );
+      const res = await getVoucherById(voucherId);
+      const voucher = res.data.data;
 
-      console.log(response.data);
+      const newStatus = voucher.status === "active" ? "inactive" : "active";
+
+      await patchVouchers(voucherId, {
+        code: voucher.code,
+        description: voucher.description,
+        startDate: voucher.startDate,
+        endDate: voucher.endDate,
+        status: newStatus,
+        type: voucher.type,
+        amount: voucher.amount,
+        quantityUse: voucher.quantityUse,
+        minPayAmount: voucher.minPayAmount,
+        maxDiscountAmount: voucher.maxDiscountAmount,
+      });
+
+      await fetchVouchers();
     } catch (error) {
       console.error(error);
     }
   }
+  useEffect(() => {
+    async function test() {
+      try {
+        const response = await getVoucherById(
+          "00b77b4a-244e-4cc8-9198-29a5d5db623a"
+        );
 
-  test();
-}, []);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    test();
+  }, []);
 
   function handleSearchChange(value: string) {
     setSearch(value);
@@ -85,6 +113,8 @@ export default function Voucher() {
     handlePageChange(1);
   }
 
+  const columns = getVoucherColumns(handlePatchVoucherStatus);
+
   return (
     <>
       <div className="flex h-full flex-col">
@@ -98,7 +128,7 @@ export default function Voucher() {
         <div className="flex-1 overflow-hidden p-6">
           <div className="h-full overflow-y-auto rounded-sm bg-white">
             <DataTable
-              columns={voucherColumns}
+              columns={columns}
               data={vouchers}
               page={currentPage}
               pageSize={pageSize}
