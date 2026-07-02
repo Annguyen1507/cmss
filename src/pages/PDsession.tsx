@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import DataTable from '../components/DataTable';
 import { getSessions, deleteSessions, createSessions, getSessionById, updateSessions } from "../features/pd_session/api/pdsession.service";
 import { getSessionColumns } from '../features/pd_session/sessionColumns';
-import type { Session, SessionDetail } from "../features/pd_session/type"
+import type { Session } from "../features/pd_session/type"
 import usePageParam from '../hooks/usePageParam';
 import useDebouncedSearch from '../hooks/useDebouncedSearch';
 import type { SortingState } from '@tanstack/react-table';
@@ -13,23 +13,26 @@ import type { SessionFormValues } from '../components/SessionForm';
 
 export default function PDsession() {
     const [sessions, setSessions] = useState<Session[]>([]);
-    const { currentPage, handlePageChange } = usePageParam();
+    const { currentPage, currentSearch, handlePageChange, handleSearch } = usePageParam();
     const [totalRows, setTotalRows] = useState(0);
     const [pageSize, setPageSize] = useState(25);
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(currentSearch);
     const [sessionToDelete, setSessionsToDelete] = useState<Session | null>(null);
     const debouncedSearch = useDebouncedSearch(search);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [editingSession, setEditingSession] = useState<SessionDetail | null>(null);
+     const [showEditForm, setShowEditForm] = useState(false);
+    const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
 
     async function fetchSessions() {
+        setLoading(true);
         try {
             const response = await getSessions({
                 page: currentPage,
                 limit: pageSize,
-                search: debouncedSearch,
+                search: currentSearch,
                 sorting,
             });
 
@@ -39,39 +42,47 @@ export default function PDsession() {
             console.log(response.data);
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     }
     useEffect(() => {
         fetchSessions();
-    }, [currentPage, pageSize, debouncedSearch, sorting]);
+    }, [currentPage, pageSize, currentSearch, sorting]);
+
+    useEffect(() => {
+        handleSearch(debouncedSearch);
+    }, [debouncedSearch]);
 
     async function handleCreateSession(values: SessionFormValues) {
-        try {
-            await createSessions(values);
-
-            await fetchSessions();
-
-            setShowCreateForm(false);
-        } catch (error) {
-            console.error(error);
+            try {
+                await createSessions(values);
+    
+                await fetchSessions();
+    
+                setShowCreateForm(false);
+            } catch (error) {
+                console.error(error);
+            }
         }
-    }
-
-    async function handleUpdateSession(
-        values: SessionFormValues,
-    ) {
-        if (!editingSession) return;
-
-        try {
-            await updateSessions(editingSession.id, values);
-
-            await fetchSessions();
-
-            setEditingSession(null);
-        } catch (error) {
-            console.error(error);
+    
+        async function handleUpdateSession(
+            values: SessionFormValues,
+        ) {
+            if (!editingSessionId) return;
+    
+            try {
+                await updateSessions(editingSessionId, values);
+    
+                await fetchSessions();
+    
+                setShowEditForm(false);
+    
+                setEditingSessionId(null);
+            } catch (error) {
+                console.error(error);
+            }
         }
-    }
 
     function handleOpenDeleteModal(id: string) {
         const selectedSession = sessions.find(
@@ -83,18 +94,11 @@ export default function PDsession() {
         setSessionsToDelete(selectedSession);
     }
 
-    async function handleOpenEditModal(id: string) {
-        try {
-            const response =
-                await getSessionById(id);
-
-            setEditingSession(
-                response.data.data,
-            );
-        } catch (error) {
-            console.error(error);
-        }
+    function handleOpenEditModal(id: string) {
+    setEditingSessionId(id);
+    setShowEditForm(true);
     }
+
     async function handleDeleteSession() {
         if (!sessionToDelete) return;
         try {
@@ -118,7 +122,6 @@ export default function PDsession() {
 
     function handleSearchChange(value: string) {
         setSearch(value);
-        handlePageChange(1);
     }
 
     function handlePageSizeChange(size: number) {
@@ -152,6 +155,7 @@ export default function PDsession() {
                             pageSize={pageSize}
                             totalRows={totalRows}
                             sorting={sorting}
+                            loading={loading}
                             onPageChange={handlePageChange}
                             onPageSizeChange={handlePageSizeChange}
                             onSortingChange={handleSortingChange}
@@ -177,10 +181,13 @@ export default function PDsession() {
                     />
                 )}
 
-                {editingSession && (
+                {showEditForm && (
                     <SessionForm
-                        session={editingSession}
-                        onClose={() => setEditingSession(null)}
+                        sessionId={editingSessionId ?? undefined}
+                        onClose={() => {
+                            setEditingSessionId(null)
+                            setShowEditForm(false)
+                        }}
                         onSubmit={handleUpdateSession}
                     />
                 )}

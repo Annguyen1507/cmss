@@ -1,4 +1,4 @@
-import { 
+import {
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -18,6 +18,7 @@ type DataTableProps<T> = {
   pageSize: number;
   totalRows: number;
   sorting: SortingState;
+  loading?: boolean;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSortingChange: (sorting: SortingState) => void;
@@ -30,6 +31,7 @@ export default function DataTable<T>({
   pageSize,
   totalRows,
   sorting,
+  loading,
   onPageChange,
   onPageSizeChange,
   onSortingChange,
@@ -85,7 +87,7 @@ export default function DataTable<T>({
 
   });
 
-  
+
 
   const startRow =
     totalRows === 0
@@ -128,21 +130,19 @@ export default function DataTable<T>({
                             minWidth:
                               header.getSize(),
                           }}
-                          className={`border-b border-r border-[#D9D9D9] px-6 text-left text-[15px] font-medium text-[#202020] whitespace-nowrap ${
-                            header.column.getIsPinned() ===
-                            'right'
+                          className={`border-b border-r border-[#D9D9D9] px-6 text-left text-[15px] font-medium text-[#202020] whitespace-nowrap ${header.column.getIsPinned() ===
+                              'right'
                               ? 'sticky right-0 z-20 border-l bg-[#F7F7F7]'
                               : ''
-                          }`}
+                            }`}
                         >
                           {header.isPlaceholder
                             ? null
                             : (
-                                <div
-                                  className={`flex items-center gap-2 ${
-                                    canSort
-                                      ? 'cursor-pointer select-none'
-                                      : ''
+                              <div
+                                className={`flex items-center gap-2 ${canSort
+                                    ? 'cursor-pointer select-none'
+                                    : ''
                                   }`}
                                 onClick={() => {
                                   if (!canSort) return;
@@ -155,13 +155,13 @@ export default function DataTable<T>({
 
                                   onPageChange(1);
                                 }}
-                                >
-                                  {flexRender(
-                                    header.column
-                                      .columnDef
-                                      .header,
-                                    header.getContext(),
-                                  )}
+                              >
+                                {flexRender(
+                                  header.column
+                                    .columnDef
+                                    .header,
+                                  header.getContext(),
+                                )}
 
                                 {canSort && (
                                   <span>
@@ -172,8 +172,8 @@ export default function DataTable<T>({
                                     )}
                                   </span>
                                 )}
-                                </div>
-                              )}
+                              </div>
+                            )}
                         </th>
                       );
                     },
@@ -183,58 +183,75 @@ export default function DataTable<T>({
           </thead>
 
           <tbody>
-            {table
-              .getRowModel()
-              .rows.map((row, index) => (
-                <tr
-                  key={row.id}
-                  className={`h-[60px] hover:bg-[#F9F9F9] ${
-                    index % 2 === 0
-                      ? 'bg-white'
-                      : 'bg-[#F3F3F3]'
-                  }`}
-                >
-                  {row
-                    .getVisibleCells()
-                    .map((cell) => (
-                      <td
-                        key={cell.id}
-                        style={{
-                          width:
-                            cell.column.getSize(),
-                          minWidth:
-                            cell.column.getSize(),
-                          maxWidth:
-                            cell.column.getSize(),
-                          overflow:
-                            cell.column.id === 'id' ? 'visible' : 'hidden',
-                          textOverflow:
-                            cell.column.id === 'id' ? 'clip' : 'ellipsis',
-                          whiteSpace:
-                            cell.column.id === 'id' ? 'normal' : 'nowrap',
-                          wordBreak:
-                            cell.column.id === 'id' ? 'break-all' : 'normal',
-                        }}
-                        className={`border-b border-r border-[#D9D9D9] px-6 align-middle text-[15px] text-[#2F2F2F] ${
-                          cell.column.getIsPinned() ===
-                          'right'
-                            ? `sticky right-0 z-10 border-l ${
-                                index % 2 === 0
-                                  ? 'bg-white'
-                                  : 'bg-[#F3F3F3]'
-                              }`
-                            : ''
-                        }`}
-                      >
-                        {flexRender(
-                          cell.column.columnDef
-                            .cell,
-                          cell.getContext(),
-                        )}
-                      </td>
-                    ))}
+            {loading ? (
+              Array.from({ length: pageSize > 10 ? 10 : pageSize }).map((_, rowIndex) => (
+                <tr key={`skeleton-${rowIndex}`} className="h-[60px]">
+                  {columns.map((_, colIndex) => (
+                    <td
+                      key={`skeleton-cell-${colIndex}`}
+                      className="border-b border-r border-[#D9D9D9] px-6 align-middle"
+                    >
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
+                    </td>
+                  ))}
                 </tr>
-              ))}
+              ))
+            ) : table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="h-[120px] px-6 text-center align-middle text-[15px] text-[#999]">
+                  No data available
+                </td>
+              </tr>
+            ) :
+              table
+                .getRowModel()
+                .rows.map((row, index) => (
+                  <tr
+                    key={row.id}
+                    className={`h-[60px] hover:bg-[#F9F9F9] ${index % 2 === 0
+                        ? 'bg-white'
+                        : 'bg-[#F3F3F3]'
+                      }`}
+                  >
+                    {row
+                      .getVisibleCells()
+                      .map((cell) => (
+                        <td
+                          key={cell.id}
+                          style={{
+                            width:
+                              cell.column.getSize(),
+                            minWidth:
+                              cell.column.getSize(),
+                            maxWidth:
+                              cell.column.getSize(),
+                            overflow:
+                              cell.column.id === 'id' ? 'visible' : 'hidden',
+                            textOverflow:
+                              cell.column.id === 'id' ? 'clip' : 'ellipsis',
+                            whiteSpace:
+                              cell.column.id === 'id' ? 'normal' : 'nowrap',
+                            wordBreak:
+                              cell.column.id === 'id' ? 'break-all' : 'normal',
+                          }}
+                          className={`border-b border-r border-[#D9D9D9] px-6 align-middle text-[15px] text-[#2F2F2F] ${cell.column.getIsPinned() ===
+                              'right'
+                              ? `sticky right-0 z-10 border-l ${index % 2 === 0
+                                ? 'bg-white'
+                                : 'bg-[#F3F3F3]'
+                              }`
+                              : ''
+                            }`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef
+                              .cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>

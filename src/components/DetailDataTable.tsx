@@ -18,6 +18,7 @@ type DetailDataTableProps<T> = {
   pageSize: number;
   totalRows: number;
   sorting: SortingState;
+  loading?: boolean;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSortingChange: (sorting: SortingState) => void;
@@ -30,6 +31,7 @@ export default function DetailDataTable<T>({
   pageSize,
   totalRows,
   sorting,
+  loading,
   onPageChange,
   onPageSizeChange,
   onSortingChange,
@@ -96,9 +98,8 @@ export default function DetailDataTable<T>({
                     >
                       {header.isPlaceholder ? null : (
                         <div
-                          className={`flex items-center gap-2 ${
-                            canSort ? 'cursor-pointer select-none' : ''
-                          }`}
+                          className={`flex items-center gap-2 ${canSort ? 'cursor-pointer select-none' : ''
+                            }`}
                           onClick={() => {
                             if (!canSort) return;
 
@@ -137,12 +138,25 @@ export default function DetailDataTable<T>({
           </thead>
 
           <tbody>
-            {table.getRowModel().rows.length === 0 ? (
+            {loading ? (
+              Array.from({ length: pageSize > 10 ? 10 : pageSize }).map((_, rowIndex) => (
+                <tr key={`skeleton-${rowIndex}`} className="h-[60px]">
+                  {columns.map((_, colIndex) => (
+                    <td
+                      key={`skeleton-cell-${colIndex}`}
+                      className="border-b border-r border-[#D9D9D9] px-6 align-middle last:border-r-0"
+                    >
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : table.getRowModel().rows.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length} className="p-0">
                   <div className="flex h-[336px] items-center justify-center text-[15px] text-[#999]">
-                  No data available
+                    No data available
                   </div>
                 </td>
               </tr>
@@ -150,9 +164,8 @@ export default function DetailDataTable<T>({
               table.getRowModel().rows.map((row, index) => (
                 <tr
                   key={row.id}
-                  className={`h-[60px] hover:bg-[#F9F9F9] ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-[#F3F3F3]'
-                  }`}
+                  className={`h-[60px] hover:bg-[#F9F9F9] ${index % 2 === 0 ? 'bg-white' : 'bg-[#F3F3F3]'
+                    }`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td

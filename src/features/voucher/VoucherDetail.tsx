@@ -18,13 +18,14 @@ function formatDate(date: string) {
 export default function VoucherDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [doulaVouchers, setDoulaVouchers] = useState<DoulaVoucher[]>([]);
   const [totalRows, setTotalRows] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [loading, setLoading] = useState(false);
+  const isReady = !!voucher && !loading;
 
   useEffect(() => {
     if (!id) return;
@@ -45,6 +46,7 @@ export default function VoucherDetail() {
     if (!id) return;
 
     async function fetchDoulaVouchers() {
+      setLoading(true);
       try {
         const res = await getDoulaVouchers({
           voucherId: id!,
@@ -57,15 +59,13 @@ export default function VoucherDetail() {
         setTotalRows(res.data.metadata.totalCount);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchDoulaVouchers();
   }, [id, page, pageSize, sorting]);
-
-  if (!voucher) {
-    return <div className="p-6">Loading...</div>;
-  }
 
   return (
     <div className="flex h-full overflow-y-auto flex-col p-6">
@@ -80,30 +80,41 @@ export default function VoucherDetail() {
       <div className="rounded-sm border border-[#D8D8D8] bg-white p-6">
         <h2 className="mb-4 text-lg font-semibold">Voucher Information</h2>
 
-        <div className="flex flex-wrap gap-x-10 gap-y-6 text-[15px]">
-          <Field label="Code" value={voucher.code} />
-          <Field label="Start Date" value={formatDate(voucher.startDate)} />
-          <Field label="End Date" value={formatDate(voucher.endDate)} />
-          <Field
-            label="Number Of Use"
-            value={`${voucher.numOfUsed}/${voucher.quantityUse}`}
-          />
-          <Field label="Type of coupon" value={voucher.type} />
-          <Field
-            label="Amount"
-            value={
-              voucher.type === "percentage"
-                ? `%${voucher.amount}`
-                : `$${voucher.amount}`
-            }
-          />
-          <Field label="Condition" value={`$${voucher.minPayAmount}`} />
-          <Field
-            label="Max Discount Amount"
-            value={`$${voucher.maxDiscountAmount}`}
-          />
-          <Field label="Description" value={voucher.description || "-"} />
-        </div>
+        {isReady ? (
+          <div className="flex flex-wrap gap-x-10 gap-y-6 text-[15px]">
+            <Field label="Code" value={voucher.code} />
+            <Field label="Start Date" value={formatDate(voucher.startDate)} />
+            <Field label="End Date" value={formatDate(voucher.endDate)} />
+            <Field
+              label="Number Of Use"
+              value={`${voucher.numOfUsed}/${voucher.quantityUse}`}
+            />
+            <Field label="Type of coupon" value={voucher.type} />
+            <Field
+              label="Amount"
+              value={
+                voucher.type === "percentage"
+                  ? `%${voucher.amount}`
+                  : `$${voucher.amount}`
+              }
+            />
+            <Field label="Condition" value={`$${voucher.minPayAmount}`} />
+            <Field
+              label="Max Discount Amount"
+              value={`$${voucher.maxDiscountAmount}`}
+            />
+            <Field label="Description" value={voucher.description || "-"} />
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-x-10 gap-y-6 text-[15px]">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="whitespace-nowrap">
+                <div className="mb-1.5 h-4 w-20 animate-pulse rounded bg-gray-200" />
+                <div className="h-5 w-24 animate-pulse rounded bg-gray-100" />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mt-6">
@@ -114,6 +125,7 @@ export default function VoucherDetail() {
           pageSize={pageSize}
           totalRows={totalRows}
           sorting={sorting}
+          loading={!isReady}
           onPageChange={setPage}
           onPageSizeChange={setPageSize}
           onSortingChange={setSorting}

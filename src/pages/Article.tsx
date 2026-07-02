@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import DataTable from '../components/DataTable';
 import { getArticles, deleteArticles, createArticles, getArticleById, updateArticle } from "../features/article/api/article.service";
 import { getArticleColumns } from '../features/article/articleColumns';
-import type { Article, ArticleDetail } from '../features/article/type';
+import type { Article } from '../features/article/type';
 import usePageParam from '../hooks/usePageParam';
 import useDebouncedSearch from '../hooks/useDebouncedSearch';
 import type { SortingState } from '@tanstack/react-table';
@@ -13,23 +13,25 @@ import type { ArticleFormValues } from '../components/ArticleForm';
 
 export default function Article() {
     const [articles, setArticles] = useState<Article[]>([]);
-    const { currentPage, handlePageChange } = usePageParam();
+    const { currentPage, currentSearch, handlePageChange, handleSearch } = usePageParam();
     const [totalRows, setTotalRows] = useState(0);
     const [pageSize, setPageSize] = useState(25);
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(currentSearch);
     const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
     const debouncedSearch = useDebouncedSearch(search);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [editingArticle, setEditingArticle] = useState<ArticleDetail | null>(null);
-
+    const [showEditForm, setShowEditForm] = useState(false);
+    const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     async function fetchArticles() {
+        setLoading(true);
         try {
             const response = await getArticles({
                 page: currentPage,
                 limit: pageSize,
-                search: debouncedSearch,
+                search: currentSearch,
                 sorting,
             });
 
@@ -39,11 +41,17 @@ export default function Article() {
             console.log(response.data);
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     }
     useEffect(() => {
         fetchArticles();
-    }, [currentPage, pageSize, debouncedSearch, sorting]);
+    }, [currentPage, pageSize, currentSearch, sorting]);
+
+    useEffect(() => {
+        handleSearch(debouncedSearch);
+    }, [debouncedSearch]);
 
     async function handleCreateArticle(values: ArticleFormValues) {
         try {
@@ -60,14 +68,16 @@ export default function Article() {
     async function handleUpdateArticle(
         values: ArticleFormValues,
     ) {
-        if (!editingArticle) return;
+        if (!editingArticleId) return;
 
         try {
-            await updateArticle(editingArticle.id, values);
+            await updateArticle(editingArticleId, values);
 
             await fetchArticles();
 
-            setEditingArticle(null);
+            setShowEditForm(false);
+
+            setEditingArticleId(null);
         } catch (error) {
             console.error(error);
         }
@@ -83,18 +93,11 @@ export default function Article() {
         setArticleToDelete(selectedArticle);
     }
 
-    async function handleOpenEditModal(id: string) {
-        try {
-            const response =
-                await getArticleById(id);
-
-            setEditingArticle(
-                response.data.data,
-            );
-        } catch (error) {
-            console.error(error);
-        }
+    function handleOpenEditModal(id: string) {
+    setEditingArticleId(id);
+    setShowEditForm(true);
     }
+
     async function handleDeleteArticle() {
         if (!articleToDelete) return;
         try {
@@ -118,7 +121,6 @@ export default function Article() {
 
     function handleSearchChange(value: string) {
         setSearch(value);
-        handlePageChange(1);
     }
 
     function handlePageSizeChange(size: number) {
@@ -152,6 +154,7 @@ export default function Article() {
                             pageSize={pageSize}
                             totalRows={totalRows}
                             sorting={sorting}
+                            loading={loading}
                             onPageChange={handlePageChange}
                             onPageSizeChange={handlePageSizeChange}
                             onSortingChange={handleSortingChange}
@@ -177,10 +180,13 @@ export default function Article() {
                     />
                 )}
 
-                {editingArticle && (
+                {showEditForm && (
                     <ArticleForm
-                        article={editingArticle}
-                        onClose={() => setEditingArticle(null)}
+                        articleId={editingArticleId ?? undefined}
+                        onClose={() => {
+                            setEditingArticleId(null);
+                            setShowEditForm(false);
+                        }}
                         onSubmit={handleUpdateArticle}
                     />
                 )}

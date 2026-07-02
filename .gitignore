@@ -146,4 +146,21 @@ export default function InputField({
     </div>
   );
 }
+return (
+                                            // <button
+                                            //     key={option}
+                                            //     type="button"
+                                            //     onClick={() => setValue("status", option, { shouldValidate: true })}
+                                            //     className={`cursor-pointer h-[44px] px-6 text-[14px] font-semibold uppercase tracking-wide transition ${index !== 0 ? "border-l border-[#93C5FD]" : ""
+                                            //         } ${isSelected
+                                            //             ? "bg-[#3B82F6] text-white"
+                                            //             : "bg-white text-[#3B82F6] hover:bg-[#EFF6FF]"
+                                            //         }`}
+                                            // >
+                                            //     {option}
+                                            // </button>
+                                        );
+                                    })}
 
+                                      {(["published", "unpublished", "draft"] as const).map((option, index) => {
+                                        // const isSelected = status === option;

@@ -9,26 +9,26 @@ import usePageParam from "../hooks/usePageParam";
 import useDebouncedSearch from "../hooks/useDebouncedSearch";
 import VoucherForm from "../components/VoucherForm";
 import type { VoucherFormValues } from "../components/VoucherForm";
-import { useParams } from "react-router-dom";
+
 
 export default function Voucher() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
-  const { currentPage, handlePageChange } = usePageParam();
+  const { currentPage, currentSearch, handlePageChange, handleSearch } = usePageParam();
   const [totalRows, setTotalRows] = useState(0);
   const [pageSize, setPageSize] = useState(25);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(currentSearch);
   const debouncedSearch = useDebouncedSearch(search);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingVoucher, setEditingVoucher] = useState<VoucherFormValues | null>(null);
-  const { id } = useParams<{ id: string }>();
+  const [loading, setLoading] = useState(false);
 
   async function fetchVouchers() {
+    setLoading(true);
     try {
       const response = await getVouchers({
         page: currentPage,
         limit: pageSize,
-        search: debouncedSearch,
+        search: currentSearch,
         sorting,
       });
 
@@ -38,12 +38,18 @@ export default function Voucher() {
       console.log(response.data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
     fetchVouchers();
-  }, [currentPage, pageSize, debouncedSearch, sorting]);
+  }, [currentPage, pageSize, currentSearch, sorting]);
+
+  useEffect(() => {
+        handleSearch(debouncedSearch);
+    }, [debouncedSearch]);
 
   async function handleCreateVoucher(values: VoucherFormValues) {
     try {
@@ -100,7 +106,6 @@ export default function Voucher() {
 
   function handleSearchChange(value: string) {
     setSearch(value);
-    handlePageChange(1);
   }
 
   function handlePageSizeChange(size: number) {
@@ -134,6 +139,7 @@ export default function Voucher() {
               pageSize={pageSize}
               totalRows={totalRows}
               sorting={sorting}
+              loading={loading}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
               onSortingChange={handleSortingChange}
